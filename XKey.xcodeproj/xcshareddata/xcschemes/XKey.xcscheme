@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A6000001"
-               BuildableName = "XKey.app"
+               BuildableName = "XKeyLite.app"
                BlueprintName = "XKey"
                ReferencedContainer = "container:XKey.xcodeproj">
             </BuildableReference>
@@ -58,7 +58,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A6000001"
-            BuildableName = "XKey.app"
+            BuildableName = "XKeyLite.app"
             BlueprintName = "XKey"
             ReferencedContainer = "container:XKey.xcodeproj">
          </BuildableReference>
@@ -75,7 +75,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A6000001"
-            BuildableName = "XKey.app"
+            BuildableName = "XKeyLite.app"
             BlueprintName = "XKey"
             ReferencedContainer = "container:XKey.xcodeproj">
          </BuildableReference>

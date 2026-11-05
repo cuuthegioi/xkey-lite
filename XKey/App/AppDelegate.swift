@@ -340,10 +340,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     // MARK: - URL Scheme Handler
     
-    /// Handle URL scheme: xkey://settings opens preferences
+    /// Handle URL scheme: xkeylite://settings opens preferences
     func application(_ application: NSApplication, open urls: [URL]) {
         for url in urls {
-            guard url.scheme == "xkey" else { continue }
+            guard url.scheme == "xkeylite" else { continue }
             
             switch url.host {
             case "settings", "preferences":

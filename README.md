@@ -71,15 +71,29 @@ Bấm nhanh Caps Lock để chuyển V ↔ E.
 
 ## Cài đặt
 
-Chưa có bản phát hành. Bạn cần build từ mã nguồn.
+### Cài qua Homebrew
 
-### Yêu cầu
+```bash
+brew install --cask cuuthegioi/tap/xkeylite
+```
 
-- macOS 12.0 trở lên.
-- Xcode.
-- Quyền Accessibility cho XKeyLite.
+Sau khi cài:
 
-### Build
+1. XKeyLite chưa được Apple công chứng (notarize), nên macOS sẽ chặn lần mở đầu. Gỡ cờ quarantine sau mỗi lần cài hoặc nâng cấp:
+
+   ```bash
+   xattr -dr com.apple.quarantine /Applications/XKeyLite.app
+   ```
+
+2. Mở XKeyLite. Cấp quyền: System Settings → Privacy & Security → Accessibility → bật XKeyLite.
+
+Nâng cấp: `brew upgrade --cask xkeylite`. Gỡ: `brew uninstall --cask xkeylite`.
+
+XKeyLite không chạy cùng lúc với XKey bản đầy đủ. Hãy gỡ XKey trước.
+
+### Build từ mã nguồn
+
+Cần macOS 12.0 trở lên và Xcode.
 
 1. Tạo chứng chỉ ký code trên máy (chỉ cần làm một lần). Nếu không có chứng chỉ này, macOS sẽ quên quyền Accessibility sau mỗi lần build.
 
@@ -92,11 +106,10 @@ Chưa có bản phát hành. Bạn cần build từ mã nguồn.
    rm key.pem id.p12
    ```
 
-2. Mở `XKey.xcodeproj` trong Xcode.
-3. Chọn scheme **XKey** và bấm Run. Bản Debug sẽ ký bằng chứng chỉ "XKeyLite Local Signing".
-4. Cấp quyền: System Settings → Privacy & Security → Accessibility → bật XKey.
+2. Mở `XKey.xcodeproj` trong Xcode, chọn scheme **XKey** và bấm Run.
+3. Cấp quyền: System Settings → Privacy & Security → Accessibility → bật XKeyLite.
 
-Cấu hình Release và `build_release.sh` vẫn là của XKey gốc. Chưa dùng được.
+Tạo bản phát hành: chạy `./build_release.sh`. Script tạo `Release/XKeyLite-<version>.zip` và cập nhật `sha256` trong `packaging/homebrew/xkeylite.rb`.
 
 ### Nơi lưu thiết lập
 

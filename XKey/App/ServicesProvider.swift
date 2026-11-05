@@ -31,7 +31,7 @@ final class ServicesProvider: NSObject {
     /// toggle path — this never touches unrelated services.
     func ensureServiceMenuEnabled() {
         ensureServiceMenuEnabled(
-            bundleID: Bundle.main.bundleIdentifier ?? "com.codetay.XKey",
+            bundleID: Bundle.main.bundleIdentifier ?? "com.cuuthegioi.XKeyLite",
             suiteName: "pbs"
         )
     }

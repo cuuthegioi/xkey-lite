@@ -571,13 +571,13 @@ class XKeyIMController: IMKInputController {
     }
 
     @objc private func openXKeySettings() {
-        if let url = URL(string: "xkey://settings") {
+        if let url = URL(string: "xkeylite://settings") {
             NSWorkspace.shared.open(url)
-            NSLog("XKeyIMController: Opened xkey://settings")
+            NSLog("XKeyIMController: Opened xkeylite://settings")
         } else {
             let process = Process()
             process.executableURL = URL(fileURLWithPath: "/usr/bin/open")
-            process.arguments = ["-b", "com.codetay.XKey"]
+            process.arguments = ["-b", "com.cuuthegioi.XKeyLite"]
             do {
                 try process.run()
                 NSLog("XKeyIMController: Launched XKey app (fallback)")

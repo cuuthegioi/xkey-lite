@@ -216,7 +216,7 @@ enum MainInputOwnershipDecision: Equatable {
 }
 
 struct InputOwnershipHandoffCoordinator {
-    static let mainBundleIdentifier = "com.codetay.XKey"
+    static let mainBundleIdentifier = "com.cuuthegioi.XKeyLite"
 
     let store: InputOwnershipHandoffStore
     let processChecker: InputOwnershipProcessChecking

@@ -71,15 +71,29 @@ Tap Caps Lock to switch V ↔ E.
 
 ## Install
 
-There is no release yet. Build it from source.
+### Install with Homebrew
 
-### Requirements
+```bash
+brew install --cask cuuthegioi/tap/xkeylite
+```
 
-- macOS 12.0 or later.
-- Xcode.
-- Accessibility permission for XKeyLite.
+After install:
 
-### Build
+1. XKeyLite is not notarized by Apple, so macOS blocks it on first open. Remove the quarantine flag after each install or upgrade:
+
+   ```bash
+   xattr -dr com.apple.quarantine /Applications/XKeyLite.app
+   ```
+
+2. Open XKeyLite. Grant permission: System Settings → Privacy & Security → Accessibility → turn on XKeyLite.
+
+Upgrade: `brew upgrade --cask xkeylite`. Uninstall: `brew uninstall --cask xkeylite`.
+
+XKeyLite does not run together with full XKey. Uninstall XKey first.
+
+### Build from source
+
+Needs macOS 12.0 or later and Xcode.
 
 1. Create a local code signing certificate (once per Mac). Without it, macOS forgets the Accessibility permission after every build.
 
@@ -92,11 +106,10 @@ There is no release yet. Build it from source.
    rm key.pem id.p12
    ```
 
-2. Open `XKey.xcodeproj` in Xcode.
-3. Choose the **XKey** scheme and click Run. Debug builds sign with the "XKeyLite Local Signing" certificate.
-4. Grant permission: System Settings → Privacy & Security → Accessibility → turn on XKey.
+2. Open `XKey.xcodeproj` in Xcode, choose the **XKey** scheme and click Run.
+3. Grant permission: System Settings → Privacy & Security → Accessibility → turn on XKeyLite.
 
-The Release config and `build_release.sh` still belong to the original XKey. They do not work yet.
+To make a release, run `./build_release.sh`. It creates `Release/XKeyLite-<version>.zip` and updates `sha256` in `packaging/homebrew/xkeylite.rb`.
 
 ### Settings location
 

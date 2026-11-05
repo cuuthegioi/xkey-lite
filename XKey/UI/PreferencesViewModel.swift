@@ -43,7 +43,7 @@ class PreferencesViewModel: ObservableObject {
         } else {
             // Fallback for macOS 12.x
             // Note: SMLoginItemSetEnabled requires bundle identifier, not App Group ID
-            SMLoginItemSetEnabled("com.codetay.XKey" as CFString, enabled)
+            SMLoginItemSetEnabled((Bundle.main.bundleIdentifier ?? "com.cuuthegioi.XKeyLite") as CFString, enabled)
         }
     }
 }
