@@ -28,8 +28,6 @@ class StatusBarViewModel: ObservableObject {
     var debugLogCallback: ((String) -> Void)?
     
     var onOpenPreferences: (() -> Void)?
-    var onOpenMacroManagement: (() -> Void)?
-    var onOpenConvertTool: (() -> Void)?
     var onOpenDebugWindow: (() -> Void)?
     var onToggleDebugWindow: (() -> Void)?  // Toggle open/close debug window
     var onRemoteDesktopTargetChanged: ((Bool) -> Void)?
@@ -213,14 +211,6 @@ class StatusBarViewModel: ObservableObject {
     
     func openPreferences() {
         onOpenPreferences?()
-    }
-    
-    func openMacroManagement() {
-        onOpenMacroManagement?()
-    }
-    
-    func openConvertTool() {
-        onOpenConvertTool?()
     }
     
     func openDebugWindow() {

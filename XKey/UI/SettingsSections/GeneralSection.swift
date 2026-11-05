@@ -46,15 +46,6 @@ struct GeneralSection: View {
                             .cornerRadius(6)
                         }
                         
-                        Toggle("Phát âm thanh khi bật/tắt", isOn: $viewModel.preferences.beepOnToggle)
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            Toggle("Nhấp icon để bật/tắt bộ gõ nhanh", isOn: $viewModel.preferences.statusBarClickToToggle)
-                            Text("Khi bật, nhấp trái vào icon trên thanh menu sẽ chuyển nhanh Việt/Anh. Nhấp phải để mở menu.")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        
                         Divider()
                         
                         VStack(alignment: .leading, spacing: 8) {
@@ -78,12 +69,13 @@ struct GeneralSection: View {
                                                     viewModel.preferences.undoTypingHotkey = newValue
                                                 }
                                             }
-                                        )
+                                        ),
+                                        allowSingleShift: true
                                     )
                                     .frame(width: 150)
                                 }
                                 
-                                Text("Mặc định: Esc. Hỗ trợ tổ hợp phím modifier như Ctrl+Shift (không áp dụng cho XKeyIM)")
+                                Text("Mặc định: Esc. Chọn ⇧ (Shift) trong danh sách để hoàn tác bằng một lần nhấn Shift. Hỗ trợ tổ hợp phím modifier như Ctrl+Shift (không áp dụng cho XKeyIM)")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
@@ -109,31 +101,12 @@ struct GeneralSection: View {
                     }
                 }
 
-                
-                // Code Table
-                SettingsGroup(title: "Bảng mã") {
-                    // Filter out experimental code tables (not fully tested yet)
-                    let supportedCodeTables = CodeTable.allCases.filter { table in
-                        table != .unicodeCompound && table != .vietnameseLocaleCP1258
-                    }
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
-                        ForEach(supportedCodeTables, id: \.self) { table in
-                            SettingsRadioButton(
-                                title: LocalizedStringKey(table.displayName),
-                                isSelected: viewModel.preferences.codeTable == table
-                            ) {
-                                viewModel.preferences.codeTable = table
-                            }
-                        }
+
+                SettingsGroup(title: "Khởi động") {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Toggle("Khởi động cùng hệ thống", isOn: $viewModel.preferences.startAtLogin)
                     }
                 }
-                
-                // Basic Options
-                SettingsGroup(title: "Tùy chọn") {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Toggle("Kiểu gõ hiện đại (oà/uý)", isOn: $viewModel.preferences.modernStyle)
-                    }
-                }                
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()

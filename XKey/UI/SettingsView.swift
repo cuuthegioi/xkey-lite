@@ -13,15 +13,8 @@ import SwiftUI
 
 enum SettingsSection: String, CaseIterable, Identifiable {
     case general = "Cơ bản"
-    case quickTyping = "Gõ nhanh"
     case advanced = "Nâng cao"
     case inputSources = "Input Sources"
-    case excludedApps = "Loại trừ"
-    case macro = "Macro"
-    case translation = "Dịch thuật"
-    case convertTool = "Chuyển đổi"
-    case appearance = "Giao diện"
-    case backupRestore = "Sao lưu"
     case about = "Giới thiệu"
 
     var id: String { rawValue }
@@ -29,15 +22,8 @@ enum SettingsSection: String, CaseIterable, Identifiable {
     var icon: String {
         switch self {
         case .general: return "gearshape"
-        case .quickTyping: return "keyboard"
         case .advanced: return "slider.horizontal.3"
         case .inputSources: return "globe"
-        case .excludedApps: return "app.badge.fill"
-        case .macro: return "text.badge.plus"
-        case .translation: return "globe.americas"
-        case .convertTool: return "arrow.left.arrow.right"
-        case .appearance: return "paintbrush"
-        case .backupRestore: return "arrow.up.arrow.down.circle"
         case .about: return "info.circle"
         }
     }
@@ -88,24 +74,10 @@ struct SettingsView: View {
                 switch navigator.selectedSection {
                 case .general:
                     GeneralSection(viewModel: viewModel)
-                case .quickTyping:
-                    QuickTypingSection(viewModel: viewModel)
                 case .advanced:
                     AdvancedSection(viewModel: viewModel)
                 case .inputSources:
                     InputSourcesSection(preferencesViewModel: viewModel)
-                case .excludedApps:
-                    ExcludedAppsSection(viewModel: viewModel)
-                case .macro:
-                    MacroSection(prefsViewModel: viewModel)
-                case .translation:
-                    TranslationSection(viewModel: viewModel)
-                case .convertTool:
-                    ConvertToolSection()
-                case .appearance:
-                    AppearanceSection(viewModel: viewModel)
-                case .backupRestore:
-                    BackupRestoreSection()
                 case .about:
                     AboutSection()
                 }

@@ -115,4 +115,42 @@ final class HostCommandRouterTests: XCTestCase {
         resolver.cancel()
         XCTAssertNil(resolver.update(modifiers: [], bindings: bindings, now: 2.1))
     }
+
+    /// Shift+scroll is horizontal scrolling. The scroll cancels the tap, so a bare-Shift
+    /// undo must not fire on release.
+    func testModifierOnlyResolverIgnoresShiftHeldDuringScroll() {
+        let bindings = [
+            (hotkey: Hotkey(keyCode: 0, modifiers: [.shift], isModifierOnly: true),
+             command: HostCommand.undoTyping),
+        ]
+        var resolver = ModifierOnlyHostCommandResolver()
+
+        XCTAssertNil(resolver.update(modifiers: [.shift], bindings: bindings, now: 0))
+        resolver.cancel()  // a scroll event arrives while Shift is held
+        XCTAssertNil(resolver.update(modifiers: [], bindings: bindings, now: 0.2))
+
+        // The next clean tap still works.
+        XCTAssertNil(resolver.update(modifiers: [.shift], bindings: bindings, now: 1))
+        XCTAssertEqual(resolver.update(modifiers: [], bindings: bindings, now: 1.1), .undoTyping)
+    }
+
+    func testModifierOnlyResolverMovesFromShiftToLargerBinding() {
+        let bindings = [
+            (hotkey: Hotkey(keyCode: 0, modifiers: [.control, .shift], isModifierOnly: true),
+             command: HostCommand.toggleVietnamese),
+            (hotkey: Hotkey(keyCode: 0, modifiers: [.shift], isModifierOnly: true),
+             command: HostCommand.undoTyping),
+        ]
+        var resolver = ModifierOnlyHostCommandResolver()
+
+        // Shift alone, then released: undo.
+        XCTAssertNil(resolver.update(modifiers: [.shift], bindings: bindings, now: 0))
+        XCTAssertEqual(resolver.update(modifiers: [], bindings: bindings, now: 0.1), .undoTyping)
+
+        // Shift, then Ctrl joins: Ctrl+Shift toggles, undo does not fire.
+        XCTAssertNil(resolver.update(modifiers: [.shift], bindings: bindings, now: 1))
+        XCTAssertNil(resolver.update(modifiers: [.control, .shift], bindings: bindings, now: 1.1))
+        XCTAssertEqual(resolver.update(modifiers: [.control], bindings: bindings, now: 1.2), .toggleVietnamese)
+        XCTAssertNil(resolver.update(modifiers: [], bindings: bindings, now: 1.3))
+    }
 }

@@ -24,6 +24,9 @@ struct AppVersion {
         return "1" // Fallback
     }
     
+    /// The XKey release this lite fork started from.
+    static let upstreamVersion = "1.2.25"
+
     /// Get full version string (e.g., "1.0.0 (1)")
     static var fullVersion: String {
         return "\(current) (\(build))"

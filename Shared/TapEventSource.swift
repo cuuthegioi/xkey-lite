@@ -74,6 +74,9 @@ final class TapEventSource {
     /// below) because this property's access level crosses the file boundary.
     var onCheckToolbarForFocusedElement: ((AppBehaviorDetector.FocusedElementInfo) -> Void)?
 
+    /// Called on the main thread after every focus check. True when an element had focus.
+    var onFocusCheckApplied: ((Bool) -> Void)?
+
     /// Clears the host's cached last-focused element so the toolbar
     /// re-evaluates on the next check.
     /// Stays on the host forever — toolbar tracking is XKey.app UI.
@@ -729,6 +732,7 @@ final class TapEventSource {
         guard snapshot.hasFocusedElement else {
             // No focused element - hide toolbar if visible
             onNoFocusedElement?()
+            onFocusCheckApplied?(false)
             return
         }
 
@@ -741,6 +745,7 @@ final class TapEventSource {
         if SharedSettings.shared.tempOffToolbarEnabled {
             onCheckToolbarForFocusedElement?(elementInfo)
         }
+        onFocusCheckApplied?(true)
     }
 
     // MARK: - Intra-App Focus Monitoring

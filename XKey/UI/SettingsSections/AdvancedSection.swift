@@ -180,59 +180,6 @@ struct AdvancedSection: View {
                     }
                 }
 
-                SettingsGroup(title: "Công cụ điều khiển") {
-                    VStack(alignment: .leading, spacing: 12) {
-                        // Main toggle to enable toolbar
-                        Toggle("Bật thanh công cụ điều khiển XKey", isOn: $viewModel.preferences.tempOffToolbarEnabled)
-
-                        // Description
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Thanh công cụ nổi cho phép tạm thời tắt kiểm tra chính tả hoặc bộ gõ Tiếng Việt ngay tại vị trí con trỏ.")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-
-                            // Sub-options (only visible when toolbar is enabled)
-                            if viewModel.preferences.tempOffToolbarEnabled {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    // Custom hotkey setting
-                                    HStack {
-                                        Text("Phím tắt hiện/ẩn:")
-                                            .font(.caption)
-                                        Spacer()
-                                        HotkeyRecorderView(hotkey: $viewModel.preferences.tempOffToolbarHotkey, minimumModifiers: 2)
-                                            .frame(width: 150)
-                                    }
-                                    .padding(.top, 4)
-
-                                    // Info box with usage instructions
-                                    VStack(alignment: .leading, spacing: 6) {
-                                        HStack(spacing: 4) {
-                                            Image(systemName: "keyboard")
-                                                .foregroundColor(.blue)
-                                            Text("Phím tắt: \(viewModel.preferences.tempOffToolbarHotkey.displayString)")
-                                                .font(.caption)
-                                                .fontWeight(.medium)
-                                        }
-
-                                        Text("• Nhấn \(viewModel.preferences.tempOffToolbarHotkey.displayString) để hiện/ẩn thanh công cụ tại con trỏ")
-                                            .font(.caption2)
-                                            .foregroundColor(.secondary)
-                                        Text("• Bấm vào nút trên thanh công cụ để bật/tắt tính năng")
-                                            .font(.caption2)
-                                            .foregroundColor(.secondary)
-                                        Text("• Bấm phím tắt Ctrl/Option để bật/tắt tính năng")
-                                            .font(.caption2)
-                                            .foregroundColor(.secondary)
-                                    }
-                                    .padding(10)
-                                    .background(Color.blue.opacity(0.05))
-                                    .cornerRadius(8)
-                                }
-                            }
-                        }
-                    }
-                }
-                
                 SettingsGroup(title: "Smart Switch") {
                     VStack(alignment: .leading, spacing: 12) {
                         // Main Smart Switch toggle
@@ -245,101 +192,12 @@ struct AdvancedSection: View {
                         }
                     }
                 }
-                
-                // Window Title Rules
-                SettingsGroup(title: "Hiệu chỉnh XKey Engine theo ứng dụng") {
-                    VStack(alignment: .leading, spacing: 12) {
-                        // Master toggle for window title rules
-                        Toggle("Bật tính năng hiệu chỉnh engine", isOn: $viewModel.preferences.windowTitleRulesEnabled)
-                        
-                        // Hotkey to toggle window title rules
-                        HStack {
-                            Text("Phím tắt bật/tắt:")
-                                .font(.caption)
-                            Spacer()
-                            HotkeyRecorderView(hotkey: $viewModel.preferences.toggleWindowRulesHotkey, minimumModifiers: 2)
-                                .frame(width: 150)
-                        }
-                        
-                        Text("Nhấn phím tắt để nhanh chóng bật/tắt tính năng hiệu chỉnh engine theo ứng dụng")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        Divider()
-                        
-                        if #available(macOS 13.0, *) {
-                            WindowTitleRulesView()
-                                .disabled(!viewModel.preferences.windowTitleRulesEnabled)
-                                .opacity(viewModel.preferences.windowTitleRulesEnabled ? 1.0 : 0.5)
-                        } else {
-                            Text("Tính năng này yêu cầu macOS 13.0 trở lên")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                }
-
-                SettingsGroup(title: "Remote Desktop") {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Toggle("Remote Session Tap",
-                               isOn: $viewModel.preferences.isRemoteDesktopTarget)
-
-                        Text("BẬT khi máy này là máy đích (machine B) — máy đang bị remote control bởi Jump Desktop, AnyDesk, TeamViewer, RustDesk, v.v.\n\nKhi BẬT: XKey luôn lắng nghe keyboard events từ remote desktop daemon (bypass HID tap). Cho phép gõ tiếng Việt bình thường trên máy B khi máy A disable XKey.\n\nĐể TẮT khi máy A disable XKey và bạn muốn gõ tiếng Việt trực tiếp trên máy B.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        Divider()
-
-                        Toggle("Gõ tiếng Việt xuyên qua remote desktop (Thử nghiệm)",
-                               isOn: $viewModel.preferences.remoteDesktopInjectMode)
-
-                        Text("Dành cho máy A (máy đang điều khiển). BẬT khi máy B không có bộ gõ tiếng Việt.\n\nKhi BẬT: XKey inject tiếng Việt qua clipboard paste (Cmd+V / Ctrl+V).\n\nTương thích (thử nghiệm):\n• ✓ Jump Desktop — gõ chậm (~1 giây / từ) hoạt động ổn định\n• ✓ AnyDesk, Parallels, VMware Fusion, Apple Remote Desktop — tương tự Jump Desktop\n• ✗ RustDesk — KHÔNG hỗ trợ (strict-check HID modifier state). Dùng manual Cmd+C/Ctrl+V.\n• ⚠ TeamViewer, Microsoft RDC — chưa kiểm thử kỹ\n\nYêu cầu: Bật đồng bộ clipboard trong ứng dụng remote desktop.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-
-                SettingsGroup(title: "Debug") {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Toggle("Bật chế độ Debug", isOn: $viewModel.preferences.debugModeEnabled)
-                        
-                        Text("Hiển thị cửa sổ debug để theo dõi hoạt động của bộ gõ")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        Divider()
-                        
-                        // Hotkey setting for debug
-                        HStack {
-                            Text("Phím tắt bật/tắt Debug:")
-                                .font(.caption)
-                            Spacer()
-                            HotkeyRecorderView(hotkey: $viewModel.preferences.debugHotkey, minimumModifiers: 2)
-                                .frame(width: 150)
-                        }
-                        
-                        Text("Nhấn phím tắt này để nhanh chóng bật/tắt cửa sổ Debug từ bất kỳ ứng dụng nào")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        Divider()
-                        
-                        // Open debug on launch option
-                        Toggle("Tự động mở Debug khi khởi động app", isOn: $viewModel.preferences.openDebugOnLaunch)
-                        
-                        Text("Khi bật, cửa sổ Debug sẽ tự động hiển thị mỗi khi khởi động XKey")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
         }
     }
-    
+
     // MARK: - Dictionary Status View (moved from SpellCheckSection)
     
     private var dictionaryStatusView: some View {

@@ -32,25 +32,9 @@ enum AppLanguage: String, Codable, CaseIterable {
         }
     }
 
-    /// Apply the user-selected language by writing to `UserDefaults.standard["AppleLanguages"]`.
-    ///
-    /// Reads the raw value from `UserDefaults.standard["appLanguage"]`, populated by
-    /// `PreferencesViewModel.save()` and kept in sync by `SharedSettings.importSettings()`.
-    /// Defaults to Vietnamese when no value has been stored yet — XKey is a Vietnamese input
-    /// method, so first-launch users see the Vietnamese UI regardless of macOS locale.
-    ///
-    /// Timing caveat: macOS resolves `AppleLanguages` when `Bundle.main` initializes, which
-    /// happens before the app's `init()` runs. Calling this method during launch therefore
-    /// affects the *next* launch, not the current one — that is why the Language picker shows
-    /// a restart confirmation.
+    /// Lite: always follow the macOS language. Clears any override an older build saved.
     static func applyLanguage() {
-        let saved = UserDefaults.standard.string(forKey: "appLanguage") ?? AppLanguage.vi.rawValue
-        let lang = AppLanguage(rawValue: saved) ?? .vi
-        if let locale = lang.localeIdentifier {
-            UserDefaults.standard.set([locale], forKey: "AppleLanguages")
-        } else {
-            UserDefaults.standard.removeObject(forKey: "AppleLanguages")
-        }
+        UserDefaults.standard.removeObject(forKey: "AppleLanguages")
     }
 }
 
@@ -85,7 +69,7 @@ struct Preferences: Codable {
     var spellCheckEnabled: Bool = false
     
     // Advanced features
-    var quickTelexEnabled: Bool = true           // cc→ch, gg→gi, etc.
+    var quickTelexEnabled: Bool = false          // cc→ch, gg→gi, etc.
     var quickStartConsonantEnabled: Bool = false // f→ph, j→gi, w→qu
     var quickEndConsonantEnabled: Bool = false   // g→ng, h→nh, k→ch
     var upperCaseFirstChar: Bool = false         // Auto capitalize first letter
@@ -133,9 +117,9 @@ struct Preferences: Codable {
     // UI settings
     var showDockIcon: Bool = false               // Show icon in Dock (menu bar always visible)
     var startAtLogin: Bool = false
-    var menuBarIconStyle: MenuBarIconStyle = .x  // Icon style for menubar
+    var menuBarIconStyle: MenuBarIconStyle = .v  // Icon style for menubar
     var statusBarClickToToggle: Bool = false     // Left-click menubar icon toggles input instead of opening menu (right-click opens menu)
-    var appLanguage: AppLanguage = .vi
+    var appLanguage: AppLanguage = .system
     var autoCheckForUpdates: Bool = true
     
     // Excluded apps - apps where Vietnamese input is disabled

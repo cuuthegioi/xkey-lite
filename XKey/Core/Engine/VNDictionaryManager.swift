@@ -30,25 +30,13 @@ class VNDictionaryManager: DictionaryLoading {
     private let signatureProvider: SignatureProvider
     private let contentReader: ContentReader
 
-    // App Group identifier (same as SharedSettings)
-    private let appGroupIdentifier = "7E6Z9B4F2H.com.codetay.inputmethod.XKey"
-
-    // Local storage path in App Group (shared between XKey and XKeyIM)
+    // Shared with XKeyIM through the same folder as SharedSettings.
     private var dictionaryDirectory: URL {
         if let dictionaryDirectoryOverride {
             return dictionaryDirectoryOverride
         }
 
-        // Use the same App Group as SharedSettings for cross-app dictionary sharing
-        guard let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier) else {
-            // Fallback to Application Support if App Group is not available
-            let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-            let dictDir = appSupport.appendingPathComponent("XKey/Dictionaries")
-            try? FileManager.default.createDirectory(at: dictDir, withIntermediateDirectories: true)
-            return dictDir
-        }
-
-        let dictDir = containerURL.appendingPathComponent("Dictionaries")
+        let dictDir = kXKeySharedDirectory.appendingPathComponent("Dictionaries")
         try? FileManager.default.createDirectory(at: dictDir, withIntermediateDirectories: true)
         return dictDir
     }

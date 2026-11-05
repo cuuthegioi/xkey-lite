@@ -102,24 +102,6 @@ final class TapEventSourceActiveHostGateTests: XCTestCase {
         try skipIfXKeyIMIsRunning()
     }
 
-    private var originalTempOffToolbarEnabled = false
-
-    override func setUp() {
-        super.setUp()
-        // With the temp-off toolbar enabled, an ungated handleFocusCheck() always
-        // reports through exactly one of onNoFocusedElement (no focused element) or
-        // onCheckToolbarForFocusedElement (one was found). That keeps the assertions
-        // below independent of whether the test process happens to have Accessibility
-        // permission and a real focused AX element.
-        originalTempOffToolbarEnabled = SharedSettings.shared.tempOffToolbarEnabled
-        SharedSettings.shared.tempOffToolbarEnabled = true
-    }
-
-    override func tearDown() {
-        SharedSettings.shared.tempOffToolbarEnabled = originalTempOffToolbarEnabled
-        super.tearDown()
-    }
-
     /// True when handleFocusCheck() got as far as its AX pass.
     /// The pass is asynchronous now — the AX reads run on the source's own serial queue
     /// and report back on the main thread — so this waits for the report instead of
@@ -129,11 +111,8 @@ final class TapEventSourceActiveHostGateTests: XCTestCase {
         let source = TapEventSource(handler: KeyboardEventHandler(), isActiveHost: isActiveHost)
         let reported = expectation(description: "focus check reported its AX pass")
         var reached = false
-        source.onNoFocusedElement = {
-            reached = true
-            reported.fulfill()
-        }
-        source.onCheckToolbarForFocusedElement = { _ in
+        // Fires once per finished pass, with or without a focused element or AX permission.
+        source.onFocusCheckApplied = { _ in
             reached = true
             reported.fulfill()
         }

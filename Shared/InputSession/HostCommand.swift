@@ -83,11 +83,18 @@ struct ModifierOnlyHostCommandResolver {
                 return nil
             }
 
-            defer { armedCommands.removeAll() }
             // Only releasing modifiers completes a tap; adding one (Fn+Shift) spoils it.
-            guard let fired = bindings.first(where: {
+            let fired = bindings.first(where: {
                 armedCommands.contains($0.command) && relevantModifiers.isSubset(of: $0.hotkey.modifiers)
-            }) else {
+            })
+            armedCommands.removeAll()
+            guard let fired else {
+                // An added modifier may complete a larger binding (Shift, then Ctrl+Shift).
+                if !matchingCommands.isEmpty {
+                    armedCommands = Set(matchingCommands)
+                    armedAt = now
+                    return nil
+                }
                 spoiledUntilRelease = !relevantModifiers.isEmpty
                 return nil
             }

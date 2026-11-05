@@ -46,6 +46,16 @@ struct HotkeyRecorderView: View {
     
     /// Minimum number of modifiers required (e.g., 2 for toolbar hotkey to avoid Ctrl/Option conflicts)
     var minimumModifiers: Int = 1
+    /// Offer a bare Shift tap as a modifier-only hotkey (preset only).
+    var allowSingleShift: Bool = false
+
+    private var availablePresets: [HotkeyPreset] {
+        var presets: [HotkeyPreset] = []
+        if allowSingleShift {
+            presets.append(HotkeyPreset(name: "⇧ (Shift)", hotkey: Hotkey(keyCode: 0, modifiers: [.shift], isModifierOnly: true)))
+        }
+        return presets + HotkeyPreset.presets
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -84,7 +94,7 @@ struct HotkeyRecorderView: View {
                 
                 // Preset menu - allows selecting common hotkeys that may be hard to record
                 Menu {
-                    ForEach(HotkeyPreset.presets.filter { preset in
+                    ForEach(availablePresets.filter { preset in
                         // Filter presets based on minimumModifiers
                         if minimumModifiers >= 2 {
                             // Only show presets with 2+ modifiers

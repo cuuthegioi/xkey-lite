@@ -14,7 +14,6 @@ class StatusBarManager: ObservableObject {
     private var popover: NSPopover?
     private var eventMonitor: Any?
     let viewModel: StatusBarViewModel
-    private var menuBarIconStyle: MenuBarIconStyle = .x
     weak var debugWindowController: DebugWindowController?
     var onCheckForUpdates: (() -> Void)?
     
@@ -23,8 +22,6 @@ class StatusBarManager: ObservableObject {
             keyboardHandler: keyboardHandler,
             eventTapManager: eventTapManager
         )
-        // Load icon style from preferences
-        self.menuBarIconStyle = SharedSettings.shared.loadPreferences().menuBarIconStyle
     }
     
     private func log(_ message: String) {
@@ -202,23 +199,8 @@ class StatusBarManager: ObservableObject {
     private func updateStatusIcon() {
         guard let button = statusItem?.button else { return }
         
-        if menuBarIconStyle == .emoji {
-            // Emoji flags render in natural color, no template image needed
-            let iconText = viewModel.isVietnameseEnabled ? "🇻🇳" : "🇬🇧"
-            button.image = nil
-            button.imagePosition = .noImage
-            button.title = ""
-            button.attributedTitle = NSAttributedString(
-                string: iconText,
-                attributes: [.font: NSFont.systemFont(ofSize: 16)]
-            )
-            return
-        }
-        
-        // Letter style (X or V) — render as template image with border
-        let iconText = menuBarIconStyle == .x
-            ? (viewModel.isVietnameseEnabled ? "X" : "E")
-            : (viewModel.isVietnameseEnabled ? "V" : "E")
+        // V for Vietnamese, E for English, as a template image with a border.
+        let iconText = viewModel.isVietnameseEnabled ? "V" : "E"
         
         let attributes: [NSAttributedString.Key: Any] = [
             .font: NSFont.systemFont(ofSize: 14, weight: .semibold),
@@ -257,11 +239,6 @@ class StatusBarManager: ObservableObject {
         viewModel.updateHotkeyDisplay(hotkey)
     }
     
-    func updateMenuBarIconStyle(_ style: MenuBarIconStyle) {
-        menuBarIconStyle = style
-        updateStatusIcon()
-        log("🎨 Menu bar icon style updated to: \(style.rawValue)")
-    }
     
     private var cancellables = Set<AnyCancellable>()
 }

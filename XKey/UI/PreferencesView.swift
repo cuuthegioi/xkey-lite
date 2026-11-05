@@ -15,15 +15,8 @@ import SwiftUI
 enum PreferencesSection: String, CaseIterable, Identifiable {
     case about = "Giới thiệu"
     case general = "Cơ bản"
-    case quickTyping = "Gõ nhanh"
     case advanced = "Nâng cao"
     case inputSources = "Input Sources"
-    case excludedApps = "Loại trừ"
-    case macro = "Macro"
-    case translation = "Dịch thuật"
-    case convertTool = "Chuyển đổi"
-    case appearance = "Giao diện"
-    case backupRestore = "Sao lưu"
 
     var id: String { rawValue }
 
@@ -31,15 +24,8 @@ enum PreferencesSection: String, CaseIterable, Identifiable {
         switch self {
         case .about: return "info.circle"
         case .general: return "gearshape"
-        case .quickTyping: return "keyboard"
         case .advanced: return "slider.horizontal.3"
         case .inputSources: return "globe"
-        case .excludedApps: return "app.badge.fill"
-        case .macro: return "text.badge.plus"
-        case .translation: return "globe.americas"
-        case .convertTool: return "arrow.left.arrow.right"
-        case .appearance: return "paintbrush"
-        case .backupRestore: return "arrow.up.arrow.down.circle"
         }
     }
 
@@ -53,14 +39,8 @@ enum PreferencesSection: String, CaseIterable, Identifiable {
         switch tabIndex {
         case 0: return .about
         case 1: return .general
-        case 2: return .quickTyping
         case 3: return .advanced
         case 4: return .inputSources
-        case 5: return .excludedApps
-        case 6: return .macro
-        case 7: return .convertTool
-        case 8: return .appearance
-        case 9: return .backupRestore
         default: return .general
         }
     }
@@ -122,24 +102,10 @@ struct PreferencesView: View {
                     AboutSection()
                 case .general:
                     GeneralSection(viewModel: viewModel)
-                case .quickTyping:
-                    QuickTypingSection(viewModel: viewModel)
                 case .advanced:
                     AdvancedSection(viewModel: viewModel)
                 case .inputSources:
                     InputSourcesSection(preferencesViewModel: viewModel)
-                case .excludedApps:
-                    ExcludedAppsSection(viewModel: viewModel)
-                case .macro:
-                    MacroSection(prefsViewModel: viewModel)
-                case .translation:
-                    TranslationSection(viewModel: viewModel)
-                case .convertTool:
-                    ConvertToolSection()
-                case .appearance:
-                    AppearanceSection(viewModel: viewModel)
-                case .backupRestore:
-                    BackupRestoreSection()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)

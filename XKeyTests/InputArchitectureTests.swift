@@ -186,4 +186,15 @@ final class InputArchitectureTests: XCTestCase {
         XCTAssertTrue(appDelegate.contains("applyRemoteDesktopTargetMode(preferences.isRemoteDesktopTarget)"))
         XCTAssertTrue(appDelegate.contains("applyRemoteDesktopTargetMode(SharedSettings.shared.isRemoteDesktopTarget)"))
     }
+
+    /// Shift+scroll must spoil a bare-Shift tap, like a mouse click does.
+    func testModifierOnlyCancelMonitorIncludesScroll() throws {
+        let eventTap = try source("XKey/EventHandling/EventTapManager.swift")
+        let start = try XCTUnwrap(eventTap.range(of: "modifierOnlyCancelMonitor = NSEvent.addGlobalMonitorForEvents("))
+        let tail = eventTap[start.upperBound...]
+        let end = try XCTUnwrap(tail.range(of: ")"))
+        let mask = tail[..<end.lowerBound]
+        XCTAssertTrue(mask.contains(".scrollWheel"), "scroll must cancel a modifier-only tap")
+        XCTAssertTrue(mask.contains(".leftMouseDown"), "clicks must still cancel a modifier-only tap")
+    }
 }

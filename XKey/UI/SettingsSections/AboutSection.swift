@@ -29,10 +29,10 @@ struct AboutSection: View {
                 
                 // App Name & Version
                 VStack(spacing: 4) {
-                    Text("XKey")
+                    Text(verbatim: "XKeyLite")
                         .font(.system(size: 24, weight: .bold))
                     
-                    Text("Vietnamese Input Method for macOS")
+                    Text("Vietnamese Input Method for lazy people")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
@@ -45,107 +45,27 @@ struct AboutSection: View {
                 Divider()
                     .padding(.horizontal, 80)
                 
-                // Credits & Donation
-                VStack(spacing: 8) {
-                    Text("Made with ❤️ & ☕")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    Button(action: {
-                        showDonationDialog = true
-                    }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "cup.and.saucer.fill")
-                            Text("Buy me a coffee")
-                        }
-                        .font(.system(size: 12, weight: .medium))
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 6)
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-                
-                Divider()
-                    .padding(.horizontal, 80)
-                
-                // GitHub Links
-                HStack(spacing: 20) {
-                    Button(action: {
-                        if let url = URL(string: "https://github.com/xmannv/xkey") {
-                            NSWorkspace.shared.open(url)
-                        }
-                    }) {
-                        HStack(spacing: 6) {
-                            Image("GitHubIcon")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 14, height: 14)
-                            Text("GitHub")
-                        }
-                        .font(.system(size: 12, weight: .medium))
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    
-                    Button(action: {
-                        if let url = URL(string: "https://github.com/xmannv/xkey/issues/new/choose") {
-                            NSWorkspace.shared.open(url)
-                        }
-                    }) {
-                        HStack(spacing: 6) {
-                            Image("BugIcon")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 14, height: 14)
-                            Text("Báo lỗi")
-                        }
-                        .font(.system(size: 12, weight: .medium))
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                }
-                .padding(.vertical, 8)
-                
-                Divider()
-                    .padding(.horizontal, 80)
+                Text("Made with ❤️ & ☕")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
 
-                // Update Check Section - Using Sparkle
-                VStack(spacing: 10) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "arrow.down.circle")
-                            .font(.system(size: 16))
-                            .foregroundColor(.blue)
-                        Text("Kiểm tra phiên bản mới")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                // Donations go to the original XKey author.
+                Button(action: {
+                    showDonationDialog = true
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "cup.and.saucer.fill")
+                        Text("Support Original Author")
                     }
-
-                    Button("Kiểm tra cập nhật") {
-                        // Temporarily lower the Settings window level so Sparkle dialog appears on top
-                        if let settingsWindow = NSApp.keyWindow {
-                            settingsWindow.level = .normal
-                        }
-                        
-                        // Use AppDelegate.shared for reliable access
-                        if let appDelegate = AppDelegate.shared {
-                            appDelegate.checkForUpdatesFromUI()
-                        } else if let delegate = NSApplication.shared.delegate as? AppDelegate {
-                            delegate.checkForUpdatesFromUI()
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
+                    .font(.system(size: 12, weight: .medium))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 6)
                 }
-                .padding(.vertical, 10)
-                .padding(.horizontal, 16)
-                .background(Color.gray.opacity(0.05))
-                .cornerRadius(10)
-                .padding(.horizontal, 30)
+                .buttonStyle(.borderedProminent)
                 
                 Spacer()
                 
-                // Copyright
-                Text("Inspired by Openkey & Unikey.")
+                Text("Inspired by XKey \(AppVersion.upstreamVersion).")
                     .font(.caption2)
                     .foregroundColor(.secondary)
                     .padding(.bottom, 16)

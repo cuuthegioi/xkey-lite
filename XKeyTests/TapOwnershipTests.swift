@@ -751,8 +751,8 @@ final class TapOwnershipTests: XCTestCase {
         // XKey.app writes some unrelated setting. Reading the value first and writing
         // it straight back exercises the full read-modify-write without changing the
         // developer's real settings.
-        let hotkeyCode = SharedSettings.shared.toggleExclusionHotkeyCode
-        SharedSettings.shared.toggleExclusionHotkeyCode = hotkeyCode
+        let startAtLogin = SharedSettings.shared.startAtLogin
+        SharedSettings.shared.startAtLogin = startAtLogin
 
         XCTAssertEqual(Self.readPlistDict()[SharedSettingsKey.xkeyIMTapArmed.rawValue] as? Bool, true,
                        "an unrelated write must not clear the flag that keeps this process out of the keystroke path")
@@ -844,20 +844,20 @@ final class TapOwnershipTests: XCTestCase {
         let path = SharedSettings.shared.settingsFilePath
         // Read-modify-write of the same value: exercises the full write path without
         // changing the developer's real settings.
-        let hotkeyCode = SharedSettings.shared.toggleExclusionHotkeyCode
+        let startAtLogin = SharedSettings.shared.startAtLogin
 
         // One write before the reader starts, so the plist is guaranteed to exist. On a
         // fresh App Group container — a CI runner, or a first run on a new machine — the
         // file does not exist until something writes it, and the reader below would count
         // every read before the writer's first landing as torn.
-        SharedSettings.shared.toggleExclusionHotkeyCode = hotkeyCode
+        SharedSettings.shared.startAtLogin = startAtLogin
         XCTAssertNotNil(FileManager.default.contents(atPath: path),
                         "the settings plist must exist before this test can tell a torn read from an absent file")
 
         let writerFinished = DispatchSemaphore(value: 0)
         DispatchQueue.global(qos: .userInitiated).async {
             for _ in 0..<300 {
-                SharedSettings.shared.toggleExclusionHotkeyCode = hotkeyCode
+                SharedSettings.shared.startAtLogin = startAtLogin
             }
             writerFinished.signal()
         }

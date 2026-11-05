@@ -267,15 +267,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Setup toggle window title rules hotkey
         setupToggleWindowRulesHotkey()
 
-        // Setup iCloud settings sync
-        iCloudSyncManager.shared.setup()
-
-        // Setup Sparkle auto-update
-        setupSparkleUpdater()
-
-        // Check and update XKeyIM if needed (on app startup)
-        checkXKeyIMUpdate()
-
         // Load Vietnamese dictionary if spell checking is enabled
         setupSpellCheckDictionary()
 
@@ -495,12 +486,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusBarManager?.viewModel.onOpenPreferences = { [weak self] in
             self?.openPreferences()
         }
-        statusBarManager?.viewModel.onOpenMacroManagement = { [weak self] in
-            self?.openMacroManagement()
-        }
-        statusBarManager?.viewModel.onOpenConvertTool = { [weak self] in
-            self?.openConvertTool()
-        }
         statusBarManager?.viewModel.onRemoteDesktopTargetChanged = { [weak self] enabled in
             self?.applyRemoteDesktopTargetMode(enabled)
         }
@@ -573,22 +558,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
     
-    func openMacroManagement() {
-        if #available(macOS 13.0, *) {
-            openSettings(selectedSection: .macro)
-        } else {
-            openLegacyPreferences(selectedTab: 6) // Tab 6 = Macro
-        }
-    }
-    
-    func openConvertTool() {
-        if #available(macOS 13.0, *) {
-            openSettings(selectedSection: .convertTool)
-        } else {
-            openLegacyPreferences(selectedTab: 7) // Tab 7 = Chuyển đổi
-        }
-    }
-    
     func openDebugWindow() {
         // Enable debug mode in preferences if not already enabled
         var prefs = SharedSettings.shared.loadPreferences()
@@ -630,9 +599,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         // Update hotkey display in menu
         statusBarManager?.updateHotkeyDisplay(preferences.toggleHotkey)
-        
-        // Update menu bar icon style
-        statusBarManager?.updateMenuBarIconStyle(preferences.menuBarIconStyle)
         
         // Update auto-check for updates setting
         updaterController?.updater.automaticallyChecksForUpdates = preferences.autoCheckForUpdates
@@ -871,16 +837,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 }
                 self.statusBarManager?.viewModel.toggleVietnamese()
                 self.debugWindowController?.logEvent("Toggled Vietnamese mode via host command")
-            case .toggleExclusionRules:
-                self.toggleExclusionRules()
-            case .toggleWindowTitleRules:
-                self.toggleWindowTitleRules()
-            case .showTranslation:
-                self.performTranslation()
-            case .translateToSource:
-                self.performTranslateToSource()
-            case .showConvertTool:
-                self.openConvertTool()
+            case .toggleExclusionRules, .toggleWindowTitleRules, .showTranslation,
+                 .translateToSource, .showConvertTool:
+                break  // Lite: these features are removed.
             case .addSelectionToUserDictionary:
                 self.performAddSelectionToDictionary()
             case .showSettings:
@@ -1225,16 +1184,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self?.debugWindowController?.logEvent(message)
         }
 
-        // Temp-off/translation toolbars stay in AppDelegate permanently —
-        // they're XKey.app UI (XKeyIM has neither).
-        source.onNoFocusedElement = {
-            if SharedSettings.shared.tempOffToolbarEnabled && TempOffToolbarController.shared.isVisible {
-                TempOffToolbarController.shared.hide()
-            }
-        }
-        source.onCheckToolbarForFocusedElement = { [weak self] elementInfo in
-            self?.checkAndShowToolbarForFocusedElement(with: elementInfo)
-        }
+        // Lite has no toolbars. Leaving the toolbar callback unset also skips the caret AX read.
         source.onResetLastFocusedElement = { [weak self] in
             self?.lastFocusedElement = nil
         }

@@ -39,19 +39,7 @@ final class AXPassOffMainThreadTests: XCTestCase {
         try skipIfXKeyIMIsRunning()
     }
 
-    private var originalTempOffToolbarEnabled = false
-
-    override func setUp() {
-        super.setUp()
-        // With the temp-off toolbar enabled, a focus pass always reports through exactly
-        // one of onNoFocusedElement (nothing focused) or onCheckToolbarForFocusedElement
-        // (something was), whether or not this process has Accessibility permission.
-        originalTempOffToolbarEnabled = SharedSettings.shared.tempOffToolbarEnabled
-        SharedSettings.shared.tempOffToolbarEnabled = true
-    }
-
     override func tearDown() {
-        SharedSettings.shared.tempOffToolbarEnabled = originalTempOffToolbarEnabled
         // start() installs this on a shared singleton; clear it so a failed assertion
         // cannot leak a live closure into the next test.
         OverlayAppDetector.shared.onOverlayVisibilityChanged = nil
@@ -120,8 +108,8 @@ final class AXPassOffMainThreadTests: XCTestCase {
             reports += 1
             expectation?.fulfill()
         }
-        source.onNoFocusedElement = record
-        source.onCheckToolbarForFocusedElement = { _ in record() }
+        // Fires once per finished pass, with or without a focused element or AX permission.
+        source.onFocusCheckApplied = { _ in record() }
         return { reports }
     }
 
@@ -821,9 +809,8 @@ final class AXPassOffMainThreadTests: XCTestCase {
             return XCTFail("no frontmost app — detectInjectionMethod returns before it merges any rule")
         }
 
-        // Custom rules only reach findAllMatchingRules() through the shared store, so this
-        // writes to it. Restored byte for byte rather than through reorderCustomRules(),
-        // which would persist whatever the in-memory list happened to hold.
+        // reorderCustomRules() sets the in-memory list that findAllMatchingRules() reads.
+        // The teardown reload clears it again, because Lite stores no custom rules.
         let savedRulesData = SharedSettings.shared.getWindowTitleRulesData() ?? Data("[]".utf8)
         let savedRulesEnabled = detector.windowTitleRulesEnabled
         defer {

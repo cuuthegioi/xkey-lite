@@ -837,14 +837,14 @@ class ToggleRulesDebugConfigTests: XCTestCase {
     /// Verify OFF states are highlighted to make disabled settings easier to notice in logs.
     func testDebugConfig_HighlightsOffStatesWithWarningEmoji() {
         let settings = SharedSettings.shared
-        let savedWindowTitleRulesEnabled = settings.windowTitleRulesEnabled
-        defer { settings.windowTitleRulesEnabled = savedWindowTitleRulesEnabled }
-        settings.windowTitleRulesEnabled = false
+        let savedExclusionRulesEnabled = settings.exclusionRulesEnabled
+        defer { settings.exclusionRulesEnabled = savedExclusionRulesEnabled }
+        settings.exclusionRulesEnabled = false
 
         let viewModel = DebugViewModel()
         let lines = viewModel.generateConfigSummary()
 
-        let hasHighlightedOffState = lines.contains { $0.contains("Window Title Rules: ⚠️ OFF") }
+        let hasHighlightedOffState = lines.contains { $0.contains("Exclusion Rules: ⚠️ OFF") }
         XCTAssertTrue(hasHighlightedOffState,
             "Config summary should highlight OFF states with a warning emoji. Lines: \(lines)")
 

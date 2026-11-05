@@ -10,9 +10,15 @@ import Foundation
 import AppKit
 import Darwin
 
-/// App Group identifier for sharing data between XKey and XKeyIM
-/// Note: macOS Sequoia+ requires TeamID prefix for native apps distributed outside App Store
+/// Name of the settings plist shared by XKey and XKeyIM.
 let kXKeyAppGroup = "7E6Z9B4F2H.com.codetay.inputmethod.XKey"
+
+/// Folder shared by XKey and XKeyIM. Lite builds have no signing team, and macOS blocks
+/// an App Group container for an app without the matching team, so use Application Support.
+let kXKeySharedDirectory: URL = {
+    let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+    return appSupport.appendingPathComponent("XKey-Lite", isDirectory: true)
+}()
 
 /// Keys for shared settings
 enum SharedSettingsKey: String {
@@ -393,12 +399,7 @@ class SharedSettings {
     
     /// Cache of plist URL (computed once)
     private lazy var plistURL: URL? = {
-        guard let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: kXKeyAppGroup) else {
-            sharedLogWarning("Cannot get App Group container URL")
-            return nil
-        }
-        
-        let prefsDir = containerURL.appendingPathComponent("Library/Preferences")
+        let prefsDir = kXKeySharedDirectory.appendingPathComponent("Preferences")
         // Ensure directory exists
         try? FileManager.default.createDirectory(at: prefsDir, withIntermediateDirectories: true)
         
@@ -644,9 +645,10 @@ class SharedSettings {
         set { writeBool(newValue, forKey: SharedSettingsKey.undoTypingHotkeyIsModifierOnly.rawValue) }
     }
 
+    // Lite: setting removed, value is fixed.
     var beepOnToggle: Bool {
-        get { readBool(forKey: SharedSettingsKey.beepOnToggle.rawValue) }
-        set { writeBool(newValue, forKey: SharedSettingsKey.beepOnToggle.rawValue) }
+        get { false }
+        set { }
     }
 
     // MARK: - Input Method Settings
@@ -659,20 +661,16 @@ class SharedSettings {
         }
     }
 
+    // Lite: setting removed, value is fixed.
     var codeTable: Int {
-        get { readInt(forKey: SharedSettingsKey.codeTable.rawValue) }
-        set {
-            writeInt(newValue, forKey: SharedSettingsKey.codeTable.rawValue)
-            notifySettingsChanged()
-        }
+        get { CodeTable.unicode.rawValue }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var modernStyle: Bool {
-        get { readBool(forKey: SharedSettingsKey.modernStyle.rawValue) }
-        set {
-            writeBool(newValue, forKey: SharedSettingsKey.modernStyle.rawValue)
-            notifySettingsChanged()
-        }
+        get { false }
+        set { }
     }
 
     var spellCheckEnabled: Bool {
@@ -685,28 +683,22 @@ class SharedSettings {
 
     // MARK: - Advanced Settings
 
+    // Lite: setting removed, value is fixed.
     var quickTelexEnabled: Bool {
-        get { readBool(forKey: SharedSettingsKey.quickTelexEnabled.rawValue) }
-        set {
-            writeBool(newValue, forKey: SharedSettingsKey.quickTelexEnabled.rawValue)
-            notifySettingsChanged()
-        }
+        get { false }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var quickStartConsonantEnabled: Bool {
-        get { readBool(forKey: SharedSettingsKey.quickStartConsonantEnabled.rawValue) }
-        set {
-            writeBool(newValue, forKey: SharedSettingsKey.quickStartConsonantEnabled.rawValue)
-            notifySettingsChanged()
-        }
+        get { false }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var quickEndConsonantEnabled: Bool {
-        get { readBool(forKey: SharedSettingsKey.quickEndConsonantEnabled.rawValue) }
-        set {
-            writeBool(newValue, forKey: SharedSettingsKey.quickEndConsonantEnabled.rawValue)
-            notifySettingsChanged()
-        }
+        get { false }
+        set { }
     }
 
     var upperCaseFirstChar: Bool {
@@ -760,44 +752,34 @@ class SharedSettings {
         }
     }
     
+    // Lite: setting removed, value is fixed.
     var tempOffToolbarEnabled: Bool {
-        get { readBool(forKey: SharedSettingsKey.tempOffToolbarEnabled.rawValue) }
-        set {
-            writeBool(newValue, forKey: SharedSettingsKey.tempOffToolbarEnabled.rawValue)
-            notifyToolbarChanged()
-        }
+        get { false }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var tempOffToolbarHotkeyCode: UInt16 {
-        get { UInt16(readInt(forKey: SharedSettingsKey.tempOffToolbarHotkeyCode.rawValue)) }
-        set {
-            writeInt(Int(newValue), forKey: SharedSettingsKey.tempOffToolbarHotkeyCode.rawValue)
-            notifyToolbarChanged()
-        }
+        get { 0 }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var tempOffToolbarHotkeyModifiers: UInt {
-        get { UInt(readInt(forKey: SharedSettingsKey.tempOffToolbarHotkeyModifiers.rawValue)) }
-        set {
-            writeInt(Int(newValue), forKey: SharedSettingsKey.tempOffToolbarHotkeyModifiers.rawValue)
-            notifyToolbarChanged()
-        }
+        get { 0 }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var convertToolHotkeyCode: UInt16 {
-        get { UInt16(readInt(forKey: SharedSettingsKey.convertToolHotkeyCode.rawValue)) }
-        set {
-            writeInt(Int(newValue), forKey: SharedSettingsKey.convertToolHotkeyCode.rawValue)
-            notifyConvertToolHotkeyChanged()
-        }
+        get { 0 }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var convertToolHotkeyModifiers: UInt {
-        get { UInt(readInt(forKey: SharedSettingsKey.convertToolHotkeyModifiers.rawValue)) }
-        set {
-            writeInt(Int(newValue), forKey: SharedSettingsKey.convertToolHotkeyModifiers.rawValue)
-            notifyConvertToolHotkeyChanged()
-        }
+        get { 0 }
+        set { }
     }
 
     /// Notify that convert tool hotkey has changed
@@ -845,32 +827,34 @@ class SharedSettings {
 
     // MARK: - Macro Settings
 
+    // Lite: setting removed, value is fixed.
     var macroEnabled: Bool {
-        get { readBool(forKey: SharedSettingsKey.macroEnabled.rawValue) }
-        set {
-            writeBool(newValue, forKey: SharedSettingsKey.macroEnabled.rawValue)
-            notifySettingsChanged()
-        }
+        get { false }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var macroInEnglishMode: Bool {
-        get { readBool(forKey: SharedSettingsKey.macroInEnglishMode.rawValue) }
-        set { writeBool(newValue, forKey: SharedSettingsKey.macroInEnglishMode.rawValue) }
+        get { false }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var autoCapsMacro: Bool {
-        get { readBool(forKey: SharedSettingsKey.autoCapsMacro.rawValue) }
-        set { writeBool(newValue, forKey: SharedSettingsKey.autoCapsMacro.rawValue) }
+        get { false }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var addSpaceAfterMacro: Bool {
-        get { readBool(forKey: SharedSettingsKey.addSpaceAfterMacro.rawValue) }
-        set { writeBool(newValue, forKey: SharedSettingsKey.addSpaceAfterMacro.rawValue) }
+        get { false }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var yieldMacroToSystemReplacement: Bool {
-        get { readBool(forKey: SharedSettingsKey.yieldMacroToSystemReplacement.rawValue) }
-        set { writeBool(newValue, forKey: SharedSettingsKey.yieldMacroToSystemReplacement.rawValue) }
+        get { false }
+        set { }
     }
 
     func getMacros() -> Data? {
@@ -916,34 +900,28 @@ class SharedSettings {
 
     // MARK: - Debug Settings
 
+    // Lite: setting removed, value is fixed.
     var debugModeEnabled: Bool {
-        get { readBool(forKey: SharedSettingsKey.debugModeEnabled.rawValue) }
-        set {
-            writeBool(newValue, forKey: SharedSettingsKey.debugModeEnabled.rawValue)
-            notifyDebugSettingsChanged()
-        }
+        get { false }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var debugHotkeyCode: UInt16 {
-        get { UInt16(readInt(forKey: SharedSettingsKey.debugHotkeyCode.rawValue)) }
-        set {
-            writeInt(Int(newValue), forKey: SharedSettingsKey.debugHotkeyCode.rawValue)
-            notifyDebugSettingsChanged()
-        }
+        get { 0 }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var debugHotkeyModifiers: UInt {
-        get { UInt(readInt(forKey: SharedSettingsKey.debugHotkeyModifiers.rawValue)) }
-        set {
-            writeInt(Int(newValue), forKey: SharedSettingsKey.debugHotkeyModifiers.rawValue)
-            notifyDebugSettingsChanged()
-        }
+        get { 0 }
+        set { }
     }
 
-    /// Open debug window automatically when app launches
+    // Lite: setting removed, value is fixed.
     var openDebugOnLaunch: Bool {
-        get { readBool(forKey: SharedSettingsKey.openDebugOnLaunch.rawValue) }
-        set { writeBool(newValue, forKey: SharedSettingsKey.openDebugOnLaunch.rawValue) }
+        get { false }
+        set { }
     }
 
     /// Notify that debug settings have changed
@@ -965,14 +943,16 @@ class SharedSettings {
         }
     }
 
+    // Lite: setting removed, value is fixed.
     var switchToXKeyHotkeyCode: UInt16 {
-        get { UInt16(readInt(forKey: SharedSettingsKey.switchToXKeyHotkeyCode.rawValue)) }
-        set { writeInt(Int(newValue), forKey: SharedSettingsKey.switchToXKeyHotkeyCode.rawValue) }
+        get { 0 }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var switchToXKeyHotkeyModifiers: UInt {
-        get { UInt(readInt(forKey: SharedSettingsKey.switchToXKeyHotkeyModifiers.rawValue)) }
-        set { writeInt(Int(newValue), forKey: SharedSettingsKey.switchToXKeyHotkeyModifiers.rawValue) }
+        get { 0 }
+        set { }
     }
 
     var switchToXKeyHotkeyIsModifierOnly: Bool {
@@ -982,9 +962,10 @@ class SharedSettings {
 
     // MARK: - UI Settings
 
+    // Lite: setting removed, value is fixed.
     var showDockIcon: Bool {
-        get { readBool(forKey: SharedSettingsKey.showDockIcon.rawValue) }
-        set { writeBool(newValue, forKey: SharedSettingsKey.showDockIcon.rawValue) }
+        get { false }
+        set { }
     }
 
     var startAtLogin: Bool {
@@ -992,60 +973,48 @@ class SharedSettings {
         set { writeBool(newValue, forKey: SharedSettingsKey.startAtLogin.rawValue) }
     }
 
+    // Lite: setting removed, value is fixed.
     var menuBarIconStyle: String {
-        get { readString(forKey: SharedSettingsKey.menuBarIconStyle.rawValue) ?? "X" }
-        set { writeString(newValue, forKey: SharedSettingsKey.menuBarIconStyle.rawValue) }
+        get { MenuBarIconStyle.v.rawValue }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var statusBarClickToToggle: Bool {
-        get { readBool(forKey: SharedSettingsKey.statusBarClickToToggle.rawValue) }
-        set { writeBool(newValue, forKey: SharedSettingsKey.statusBarClickToToggle.rawValue) }
+        get { false }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var appLanguage: String {
-        // Default to Vietnamese on first launch — matches Preferences.appLanguage default
-        // so loadPreferences() from an empty plist yields the same value as a fresh
-        // Preferences() struct.
-        get { readString(forKey: SharedSettingsKey.appLanguage.rawValue) ?? AppLanguage.vi.rawValue }
-        set { writeString(newValue, forKey: SharedSettingsKey.appLanguage.rawValue) }
+        get { AppLanguage.system.rawValue }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var autoCheckForUpdates: Bool {
-        get {
-            let dict = readPlistDict()
-            // Default to true if key not found
-            if let value = dict[SharedSettingsKey.autoCheckForUpdates.rawValue] as? Bool {
-                return value
-            }
-            return true
-        }
-        set { writeBool(newValue, forKey: SharedSettingsKey.autoCheckForUpdates.rawValue) }
+        get { false }
+        set { }
     }
 
     // MARK: - Translation Settings
 
+    // Lite: setting removed, value is fixed.
     var translationEnabled: Bool {
-        get { readBool(forKey: SharedSettingsKey.translationEnabled.rawValue) }
-        set {
-            writeBool(newValue, forKey: SharedSettingsKey.translationEnabled.rawValue)
-            notifyTranslationSettingsChanged()
-        }
+        get { false }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var translationHotkeyCode: UInt16 {
-        get { UInt16(readInt(forKey: SharedSettingsKey.translationHotkeyCode.rawValue)) }
-        set {
-            writeInt(Int(newValue), forKey: SharedSettingsKey.translationHotkeyCode.rawValue)
-            notifyTranslationSettingsChanged()
-        }
+        get { 0 }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var translationHotkeyModifiers: UInt {
-        get { UInt(readInt(forKey: SharedSettingsKey.translationHotkeyModifiers.rawValue)) }
-        set {
-            writeInt(Int(newValue), forKey: SharedSettingsKey.translationHotkeyModifiers.rawValue)
-            notifyTranslationSettingsChanged()
-        }
+        get { 0 }
+        set { }
     }
 
     var translationSourceLanguage: String {
@@ -1093,30 +1062,22 @@ class SharedSettings {
         set { writeInt(newValue, forKey: SharedSettingsKey.translateToSourceAutoHideSeconds.rawValue) }
     }
 
+    // Lite: setting removed, value is fixed.
     var translationToolbarEnabled: Bool {
-        get {
-            readBool(forKey: SharedSettingsKey.translationToolbarEnabled.rawValue)
-        }
-        set {
-            writeBool(newValue, forKey: SharedSettingsKey.translationToolbarEnabled.rawValue)
-            notifyTranslationToolbarSettingsChanged()
-        }
+        get { false }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var translateToSourceHotkeyCode: UInt16 {
-        get { UInt16(readInt(forKey: SharedSettingsKey.translateToSourceHotkeyCode.rawValue)) }
-        set {
-            writeInt(Int(newValue), forKey: SharedSettingsKey.translateToSourceHotkeyCode.rawValue)
-            notifyTranslationSettingsChanged()
-        }
+        get { 0 }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var translateToSourceHotkeyModifiers: UInt {
-        get { UInt(readInt(forKey: SharedSettingsKey.translateToSourceHotkeyModifiers.rawValue)) }
-        set {
-            writeInt(Int(newValue), forKey: SharedSettingsKey.translateToSourceHotkeyModifiers.rawValue)
-            notifyTranslationSettingsChanged()
-        }
+        get { 0 }
+        set { }
     }
 
     var translationResultAutoHideSeconds: Int {
@@ -1151,7 +1112,7 @@ class SharedSettings {
     // MARK: - Excluded Apps
 
     func getExcludedApps() -> Data? {
-        return readData(forKey: SharedSettingsKey.excludedApps.rawValue)
+        nil  // Lite: excluded apps removed.
     }
 
     func setExcludedApps(_ data: Data) {
@@ -1166,12 +1127,10 @@ class SharedSettings {
         }
     }
 
+    // Lite: setting removed, value is fixed.
     var remoteDesktopInjectMode: Bool {
-        get { readBool(forKey: SharedSettingsKey.remoteDesktopInjectMode.rawValue) }
-        set {
-            writeBool(newValue, forKey: SharedSettingsKey.remoteDesktopInjectMode.rawValue)
-            notifySettingsChanged()
-        }
+        get { false }
+        set { }
     }
 
     // MARK: - Vietnamese On/Off (shared by both processes)
@@ -1412,42 +1371,42 @@ class SharedSettings {
         return cacheGeneration
     }
 
+    // Lite: setting removed, value is fixed.
     var isRemoteDesktopTarget: Bool {
-        get { readBool(forKey: SharedSettingsKey.isRemoteDesktopTarget.rawValue) }
-        set {
-            writeBool(newValue, forKey: SharedSettingsKey.isRemoteDesktopTarget.rawValue)
-            notifySettingsChanged()
-        }
+        get { false }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var toggleExclusionHotkeyCode: UInt16 {
-        get { UInt16(readInt(forKey: SharedSettingsKey.toggleExclusionHotkeyCode.rawValue)) }
-        set { writeInt(Int(newValue), forKey: SharedSettingsKey.toggleExclusionHotkeyCode.rawValue) }
+        get { 0 }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var toggleExclusionHotkeyModifiers: UInt {
-        get { UInt(readInt(forKey: SharedSettingsKey.toggleExclusionHotkeyModifiers.rawValue)) }
-        set { writeInt(Int(newValue), forKey: SharedSettingsKey.toggleExclusionHotkeyModifiers.rawValue) }
+        get { 0 }
+        set { }
     }
 
     // MARK: - Window Title Rules Toggle
 
+    // Lite: setting removed, value is fixed.
     var windowTitleRulesEnabled: Bool {
-        get { readBool(forKey: SharedSettingsKey.windowTitleRulesEnabled.rawValue) }
-        set {
-            writeBool(newValue, forKey: SharedSettingsKey.windowTitleRulesEnabled.rawValue)
-            notifySettingsChanged()
-        }
+        get { true }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var toggleWindowRulesHotkeyCode: UInt16 {
-        get { UInt16(readInt(forKey: SharedSettingsKey.toggleWindowRulesHotkeyCode.rawValue)) }
-        set { writeInt(Int(newValue), forKey: SharedSettingsKey.toggleWindowRulesHotkeyCode.rawValue) }
+        get { 0 }
+        set { }
     }
 
+    // Lite: setting removed, value is fixed.
     var toggleWindowRulesHotkeyModifiers: UInt {
-        get { UInt(readInt(forKey: SharedSettingsKey.toggleWindowRulesHotkeyModifiers.rawValue)) }
-        set { writeInt(Int(newValue), forKey: SharedSettingsKey.toggleWindowRulesHotkeyModifiers.rawValue) }
+        get { 0 }
+        set { }
     }
 
     // MARK: - Input Source Management
@@ -1487,7 +1446,7 @@ class SharedSettings {
     // MARK: - Window Title Rules
     
     func getWindowTitleRulesData() -> Data? {
-        return readData(forKey: SharedSettingsKey.windowTitleRules.rawValue)
+        nil  // Lite: custom rules removed; only built-in rules apply.
     }
     
     func setWindowTitleRulesData(_ data: Data) {
@@ -1502,11 +1461,7 @@ class SharedSettings {
     
     /// Get the list of disabled built-in rule names
     func getDisabledBuiltInRules() -> Set<String> {
-        guard let data = readData(forKey: SharedSettingsKey.disabledBuiltInRules.rawValue),
-              let names = try? JSONDecoder().decode([String].self, from: data) else {
-            return []
-        }
-        return Set(names)
+        []  // Lite: built-in rules always use their defaults.
     }
     
     /// Set the list of disabled built-in rule names
@@ -1518,11 +1473,7 @@ class SharedSettings {
     
     /// Get the list of enabled built-in rule names (for rules that are disabled by default)
     func getEnabledBuiltInRules() -> Set<String> {
-        guard let data = readData(forKey: SharedSettingsKey.enabledBuiltInRules.rawValue),
-              let names = try? JSONDecoder().decode([String].self, from: data) else {
-            return []
-        }
-        return Set(names)
+        []  // Lite: built-in rules always use their defaults.
     }
     
     /// Set the list of enabled built-in rule names (for rules that are disabled by default)
@@ -2051,12 +2002,10 @@ class SharedSettings {
         // Temp off toolbar hotkey
         let toolbarHotkeyCode = tempOffToolbarHotkeyCode
         let toolbarHotkeyModifiers = tempOffToolbarHotkeyModifiers
-        if hasStoredValue(forKey: SharedSettingsKey.tempOffToolbarHotkeyCode.rawValue) {
-            prefs.tempOffToolbarHotkey = Hotkey(
-                keyCode: toolbarHotkeyCode,
-                modifiers: ModifierFlags(rawValue: toolbarHotkeyModifiers)
-            )
-        }
+        prefs.tempOffToolbarHotkey = Hotkey(
+            keyCode: toolbarHotkeyCode,
+            modifiers: ModifierFlags(rawValue: toolbarHotkeyModifiers)
+        )
 
         // Convert tool hotkey
         let convertHotkeyCode = convertToolHotkeyCode
@@ -2148,12 +2097,10 @@ class SharedSettings {
         prefs.translationEnabled = translationEnabled
         let transHotkeyCode = translationHotkeyCode
         let transHotkeyModifiers = translationHotkeyModifiers
-        if hasStoredValue(forKey: SharedSettingsKey.translationHotkeyCode.rawValue) {
-            prefs.translationHotkey = Hotkey(
-                keyCode: transHotkeyCode,
-                modifiers: ModifierFlags(rawValue: transHotkeyModifiers)
-            )
-        }
+        prefs.translationHotkey = Hotkey(
+            keyCode: transHotkeyCode,
+            modifiers: ModifierFlags(rawValue: transHotkeyModifiers)
+        )
         // Translation language codes (stored as String)
         prefs.translationSourceLanguageCode = translationSourceLanguage
         prefs.translationTargetLanguageCode = translationTargetLanguage
@@ -2180,12 +2127,10 @@ class SharedSettings {
         prefs.openDebugOnLaunch = openDebugOnLaunch
         let dbgHotkeyCode = debugHotkeyCode
         let dbgHotkeyModifiers = debugHotkeyModifiers
-        if hasStoredValue(forKey: SharedSettingsKey.debugHotkeyCode.rawValue) {
-            prefs.debugHotkey = Hotkey(
-                keyCode: dbgHotkeyCode,
-                modifiers: ModifierFlags(rawValue: dbgHotkeyModifiers)
-            )
-        }
+        prefs.debugHotkey = Hotkey(
+            keyCode: dbgHotkeyCode,
+            modifiers: ModifierFlags(rawValue: dbgHotkeyModifiers)
+        )
 
         return prefs
     }

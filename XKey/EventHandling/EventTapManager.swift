@@ -292,8 +292,9 @@ class EventTapManager {
             updateSessionTapForFrontmostApp()
         }
 
+        // Scroll counts too: Shift+scroll is horizontal scrolling, not a Shift tap.
         modifierOnlyCancelMonitor = NSEvent.addGlobalMonitorForEvents(
-            matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown, .systemDefined]
+            matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown, .systemDefined, .scrollWheel]
         ) { [weak self] _ in
             self?.modifierOnlyCommandResolver.cancel()
         }

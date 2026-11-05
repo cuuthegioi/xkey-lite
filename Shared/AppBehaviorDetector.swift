@@ -2367,6 +2367,7 @@ class AppBehaviorDetector {
     func loadCustomRules() {
         guard let data = SharedSettings.shared.getWindowTitleRulesData(),
               var rules = try? JSONDecoder().decode([WindowTitleRule].self, from: data) else {
+            customRules = []  // No stored rules means none, so drop anything set in memory.
             return
         }
 
